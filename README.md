@@ -1,30 +1,30 @@
 **Welcome to the risk-aware-unmanned-ship-for-roc project!**
 
-Please do you a favor and use Andaconda / miniconda to ease your installation.
+Please do you a favor and use conda to ease your installation.
 
 ### Setup Seachart with Anaconda (See [Seachart](https://github.com/simbli/seacharts))
 
 Install an edition of the [Anaconda](
-https://www.anaconda.com/products/individual-d) package manager, and then create a new
-_conda environment_
-with [Python 3.11](https://www.python.org/downloads/) or higher using e.g. the
-graphical user interface of [PyCharm Professional](
-https://www.jetbrains.com/lp/pycharm-anaconda/) as detailed [here](
-https://www.jetbrains.com/help/pycharm/conda-support-creating-conda-virtual-environment.html
-).
-
-The required data processing libraries for spatial calculations and
-visualization may subsequently be installed simply by running the following
-commands in the terminal of your chosen environment:
+https://www.anaconda.com/products/individual-d) package manager, activate your base environment (```conda activate```) and navigate to this folder. To create and setup your environment, just run the following command and go grab a cup of coffee.
 
 ```
-conda install -c conda-forge fiona cartopy matplotlib
-conda install matplotlib-scalebar cerberys pyyaml
-conda install seachart
+conda env create -f environment.yml
 ```
-
-### Install Requirements
+Once done, verify that the environment  ```risk-aware-unmanned-ship-for-roc-env``` appears in the list when typing:
 
 ```
-conda install --file requirements.txt
+conda env list
 ```
+And then activate it:
+```
+conda activate risk-aware-unmanned-ship-for-roc-env
+```
+
+To check that everything was correctly installed you can run two python files (one for each of the two main dependencies [SeaCharts](https://github.com/simbli/seacharts/tree/main) and [ship_in_transit_simulator](https://github.com/BorgeRokseth/ship_in_transit_simulator/tree/master)). Make sure that you have already bathymetry data in the `/data` folder, following instructions from [SeaCharts](https://github.com/simbli/seacharts/tree/main) package.
+
+```
+python -m tests.seacharts.display
+python -m tests.ship_in_transit_simulator.ship_route_following
+```
+
+
