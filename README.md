@@ -1,6 +1,12 @@
 **Welcome to the risk-aware-unmanned-ship-for-roc project!**
 
-Please do you a favor and use conda to ease your installation.
+Make sure to clone this repository in recursive mode:
+
+```
+git clone --recurse-submodules git@github.com:stiefen1/risk_aware_unmanned_ship_for_roc.git
+```
+
+Also, do you a favor and use conda to ease your installation.
 
 ### Setup Seachart with Anaconda (See [Seachart](https://github.com/simbli/seacharts))
 
