@@ -3,7 +3,7 @@
 Make sure to clone this repository in recursive mode:
 
 ```
-git clone --recurse-submodules git@github.com:stiefen1/risk_aware_unmanned_ship_for_roc.git
+git clone --recurse-submodules https://github.com/stiefen1/risk_aware_unmanned_ship_for_roc.git
 ```
 
 Also, do you a favor and use conda to ease your installation.
