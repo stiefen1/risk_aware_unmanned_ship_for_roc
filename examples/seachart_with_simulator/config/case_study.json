@@ -1,0 +1,84 @@
+{
+    "env": {
+        "current_velocity_component_from_north": -2,
+        "current_velocity_component_from_east": -2,
+        "wind_speed": 0,
+        "wind_direction": 0
+    },
+
+    "ship_config": {
+        "coefficient_of_deadweight_to_displacement": 0.7,
+        "bunkers": 200000,
+        "ballast": 200000,
+        "length_of_ship": 80,
+        "width_of_ship": 16,
+        "added_mass_coefficient_in_surge": 0.4,
+        "added_mass_coefficient_in_sway": 0.4,
+        "added_mass_coefficient_in_yaw": 0.4,
+        "dead_weight_tonnage": 3850000,
+        "mass_over_linear_friction_coefficient_in_surge": 130,
+        "mass_over_linear_friction_coefficient_in_sway": 18,
+        "mass_over_linear_friction_coefficient_in_yaw": 90,
+        "nonlinear_friction_coefficient__in_surge": 2400,
+        "nonlinear_friction_coefficient__in_sway": 4000,
+        "nonlinear_friction_coefficient__in_yaw": 400
+    },
+
+    "machinery_system_config": {
+        "machinery_operating_mode": 0,
+        "linear_friction_main_engine": 68,
+        "linear_friction_hybrid_shaft_generator": 57,
+        "gear_ratio_between_main_engine_and_propeller": 0.6,
+        "gear_ratio_between_hybrid_shaft_generator_and_propeller": 0.6,
+        "propeller_inertia": 6000,
+        "propeller_diameter": 3.1,
+        "propeller_speed_to_torque_coefficient": 7.5,
+        "propeller_speed_to_thrust_force_coefficient": 1.7,
+        "hotel_load": 200000,
+        "rated_speed_main_engine_rpm": 1000,
+        "rudder_angle_to_sway_force_coefficient": 50e3,
+        "rudder_angle_to_yaw_force_coefficient": 500e3,
+        "max_rudder_angle_degrees": 30
+    },
+
+    "machinery_mode_params": {
+        "main_engine_capacity": 2160e3, 
+        "electrical_capacity": 510e3,
+        "shaft_generator_state": "OFF"
+    },
+
+    "initial_pose": {
+        "initial_north_position_m": 44300,
+        "initial_east_position_m": 6956450,
+        "initial_yaw_angle_rad": 0.785,
+        "initial_forward_speed_m_per_s": 7,
+        "initial_sideways_speed_m_per_s": 0,
+        "initial_yaw_rate_rad_per_s": 0
+        },
+
+    "initial_ship_states": {
+        "initial_propeller_shaft_speed_rad_per_s": 41.887
+    },
+
+    "throttle_controller_gains": {
+        "kp_ship_speed": 7.0,
+        "ki_ship_speed": 0.13,
+        "kp_shaft_speed": 0.05,
+        "ki_shaft_speed": 0.005
+    },
+
+    "heading_controller_gains": {
+        "kp": 4.0,
+        "kd": 90,
+        "ki": 0.01
+    },
+
+    "los_guidance_parameters": {
+        "radius_of_acceptance": 600,
+        "lookahead_distance": 500,
+        "integral_gain": 0.002,
+        "integrator_windup_limit": 4000
+    }
+
+
+}
