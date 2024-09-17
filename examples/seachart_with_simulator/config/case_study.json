@@ -48,9 +48,9 @@
     },
 
     "initial_pose": {
-        "initial_north_position_m": 44300,
-        "initial_east_position_m": 6956450,
-        "initial_yaw_angle_rad": 0.785,
+        "initial_north_position_m": 42300,
+        "initial_east_position_m": 6956250,
+        "initial_yaw_angle_rad": -0.785,
         "initial_forward_speed_m_per_s": 7,
         "initial_sideways_speed_m_per_s": 0,
         "initial_yaw_rate_rad_per_s": 0

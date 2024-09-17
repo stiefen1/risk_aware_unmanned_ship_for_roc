@@ -1,12 +1,11 @@
 import json, os, numpy as np, time
+from seacharts.enc import ENC
 from submodules.ship_in_transit_simulator.models import EnvironmentConfiguration, ShipConfiguration, MachineryModeParams, \
                                                         MachineryMode, MachinerySystemConfiguration, SimulationConfiguration, \
                                                         ShipModel, ThrottleControllerGains, EngineThrottleFromSpeedSetPoint, \
                                                         HeadingControllerGains, LosParameters, HeadingByRouteController, \
                                                         StaticObstacle, MachineryModes, SpecificFuelConsumptionWartila6L26, \
                                                         SpecificFuelConsumptionBaudouin6M26Dot3
-from seacharts.enc import ENC
-from seacharts.utils.files import read_ship_poses
 
 def load_obstacles(file_path: str) -> list[StaticObstacle]:
     obstacle_txt = np.loadtxt(file_path)
@@ -18,12 +17,17 @@ def load_obstacles(file_path: str) -> list[StaticObstacle]:
 def heading_sim_to_enc(heading: float) -> float:
     return 90 - heading * 180 / np.pi
 
+def eval_wind(i: int, j: int) -> np.array:
+    return np.array([np.cos(np.pi*i/5000), -np.sin(2*np.pi*j/500)])
+
 def main():
     # Paths
     fileDirName:        str = os.path.dirname(__file__)
     configDirName:      str = os.path.join(fileDirName, "config")
     routeFilePath:      str = os.path.join(configDirName, "route.txt")
     obstacleFilePath:   str = os.path.join(configDirName, 'obstacles.txt')
+    dataDirName:        str = os.path.join("data")
+    vesselsFilePath:    str = os.path.join(dataDirName, 'vessels.csv')
 
     ### Setup ENC
     size = 9000, 5062
@@ -96,21 +100,49 @@ def main():
     )
 
 
-    desired_forward_speed_meters_per_second = 8.5
+    desired_forward_speed_meters_per_second = 5
     integrator_term = []
     times = []
 
     # Simulation parameters
-    timeSpeedFactor:        float = 10.0 # Meaning 1 second in real time is 10 second in simulation time
+    timeSpeedFactor:        float = 100.0 # Meaning 1 second in real time is 10 second in simulation time
     updateVizRate:          float = .5 # Update ENC every second in real time
     updateLogRate:          float = 5 # Print out simulation data every 30 seconds
+    updateRouteRate:        float = 10 # Update route every 10 seconds
     timeToProcess:          float = 0.0 # Time to process the simulation data
+    currentWaypointIndex:   int = 0 # Current waypoint
 
     # TODO: Add obstacles to ENC
+    print(obstacles_list)
+    for obstacle in obstacles_list:
+        print((int(obstacle.e), int(obstacle.n)), obstacle.r)
+        enc.display.draw_circle((int(obstacle.n), int(obstacle.e)), obstacle.r, "black")
 
     # TODO: Add waypoints to ENC
+    with open(routeFilePath, "r") as f:
+        route = f.readlines()
+        waypoints = []
+        for line in route:
+            waypoint = line.split()
+            waypoints.append((int(waypoint[0]), int(waypoint[1])))
+            enc.display.draw_circle((int(waypoint[0]), int(waypoint[1])), 20, "red")
+
+    # TODO: Add wind direction and intensity to ENC
+    windResolution: float               = 1000
+    windArraySize:  tuple[float, float] = size[0] // windResolution, size[1] // windResolution
+    wind:           np.ndarray          = np.zeros(shape=(windArraySize[0], windArraySize[1], 2), dtype=np.float32)
+    intensityToViz: float               = 150
+    for i in range(windArraySize[0]):
+        for j in range(windArraySize[1]):
+            x:  float   = i*windResolution + center[0]
+            y:  float   = j*windResolution + center[1]
+            wind[i, j] = eval_wind(x, y)
+            start = np.array([x - size[0]/2, y - size[1]/2])
+            stop = start + wind[i, j] * intensityToViz
+            enc.display.draw_arrow(start=(start[0], start[1]), end=(stop[0], stop[1]), color="orange")
 
     # TODO: Add route to ENC
+    enc.display.draw_line(waypoints, 'red', edge_style='--', width=.1)
 
     # Start ENC
     enc.display.start()
@@ -124,7 +156,7 @@ def main():
         print(f"Update visualization rate is less than time step -> setting it to {timeStep:.2f}")
         updateVizRate = timeStep
 
-    while shipModel.int.time < shipModel.int.sim_time:
+    while shipModel.int.time < shipModel.int.sim_time and shipModel:
         start = time.time()
         # Measure position and speed
         north_position: float   = shipModel.north
@@ -146,6 +178,11 @@ def main():
             enc.display.features.update_vessels()
             enc.display.redraw_plot()
             enc.display.update_plot()
+
+        # Update route on ENC
+        if (shipModel.int.time % updateRouteRate) == 0:
+            enc.display.draw_circle((int(north_position), int(east_position)), 10, "red")
+
 
         # Find appropriate rudder angle and engine throttle
         rudder_angle = autoPilot.rudder_angle_from_route(
@@ -170,6 +207,13 @@ def main():
         # Progress time variable to the next time step
         shipModel.int.next_time()
 
+        # TODO: Check if the ship has reached final waypoint
+        currentWaypointIndex, nextWaypointIndex = autoPilot.navigate.next_wpt(currentWaypointIndex, north_position, east_position)
+        if currentWaypointIndex == nextWaypointIndex:
+            print(f"Ship has reached final waypoint {currentWaypointIndex}")
+            enc.display.figure.waitforbuttonpress()
+            break
+
         # Time to process the simulation data
         end = time.time()
         timeToProcess = end - start
@@ -180,6 +224,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # Setup Logging
+    # TODO: Setup Logging
 
     main()
