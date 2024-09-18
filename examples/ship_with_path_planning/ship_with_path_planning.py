@@ -7,6 +7,9 @@ from submodules.ship_in_transit_simulator.models import EnvironmentConfiguration
                                                         StaticObstacle, MachineryModes, SpecificFuelConsumptionWartila6L26, \
                                                         SpecificFuelConsumptionBaudouin6M26Dot3
 
+from submodules.PathPlanning.Search_based_Planning.Search_2D.Astar import AStar
+from submodules.PathPlanning.Sampling_based_Planning.rrt_2D.rrt import Rrt
+
 from src.utils import load_obstacles, heading_sim_to_enc
 
 def eval_wind(i: int, j: int) -> np.array:

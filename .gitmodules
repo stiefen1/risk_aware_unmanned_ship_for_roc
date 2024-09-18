@@ -1,3 +1,6 @@
 [submodule "submodules/ship_in_transit_simulator"]
 	path = submodules/ship_in_transit_simulator
 	url = https://github.com/BorgeRokseth/ship_in_transit_simulator.git
+[submodule "submodules/PathPlanning"]
+	path = submodules/PathPlanning
+	url = https://github.com/stiefen1/PathPlanning.git
