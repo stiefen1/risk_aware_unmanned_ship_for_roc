@@ -1,7 +1,7 @@
 {
     "env": {
-        "current_velocity_component_from_north": -2,
-        "current_velocity_component_from_east": -2,
+        "current_velocity_component_from_north": 0,
+        "current_velocity_component_from_east": 0,
         "wind_speed": 0,
         "wind_direction": 0
     },
@@ -50,19 +50,19 @@
     "initial_pose": {
         "initial_north_position_m": 42300,
         "initial_east_position_m": 6956250,
-        "initial_yaw_angle_rad": -0.785,
-        "initial_forward_speed_m_per_s": 7,
+        "initial_yaw_angle_rad": 3.14,
+        "initial_forward_speed_m_per_s": 0,
         "initial_sideways_speed_m_per_s": 0,
         "initial_yaw_rate_rad_per_s": 0
         },
 
     "initial_ship_states": {
-        "initial_propeller_shaft_speed_rad_per_s": 41.887
+        "initial_propeller_shaft_speed_rad_per_s": 40
     },
 
     "throttle_controller_gains": {
         "kp_ship_speed": 7.0,
-        "ki_ship_speed": 0.13,
+        "ki_ship_speed": 0.0,
         "kp_shaft_speed": 0.05,
         "ki_shaft_speed": 0.005
     },
@@ -70,13 +70,13 @@
     "heading_controller_gains": {
         "kp": 4.0,
         "kd": 90,
-        "ki": 0.01
+        "ki": 0.0
     },
 
     "los_guidance_parameters": {
-        "radius_of_acceptance": 600,
-        "lookahead_distance": 500,
-        "integral_gain": 0.002,
+        "radius_of_acceptance": 300,
+        "lookahead_distance": 300,
+        "integral_gain": 0.00,
         "integrator_windup_limit": 4000
     }
 
