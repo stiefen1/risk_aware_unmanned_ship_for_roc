@@ -15,9 +15,8 @@ from submodules.PathPlanning.Sampling_based_Planning.rrt_2D.rrt import Rrt
 
 from src.utils import load_obstacles, heading_sim_to_enc
 from src.map import DiscreteMap
+from src.wind import WindArray, WindFunction, WindVector
 
-def eval_wind(i: int, j: int) -> np.array:
-    return np.array([np.cos(np.pi*i/5000), -np.sin(2*np.pi*j/500)])
 
 def main():
     # Paths
@@ -31,6 +30,8 @@ def main():
     ### Setup ENC
     size = 9000, 5062
     center = 44300, 6956450
+    left_down_corner = (center[0] - size[0]/2, center[1] - size[1]/2)
+    right_up_corner = (center[0] + size[0]/2, center[1] + size[1]/2)
 
     print("Loading ENC...")
     enc = ENC()
@@ -151,18 +152,13 @@ def main():
             enc.display.draw_circle((int(waypoint[0]), int(waypoint[1])), 20, "red")
 
     # TODO: Add wind direction and intensity to ENC
-    windResolution: float               = 1000
-    windArraySize:  tuple[float, float] = size[0] // windResolution, size[1] // windResolution
-    wind:           np.ndarray          = np.zeros(shape=(windArraySize[0], windArraySize[1], 2), dtype=np.float32)
-    intensityToViz: float               = 150
-    for i in range(windArraySize[0]):
-        for j in range(windArraySize[1]):
-            x:  float   = i*windResolution + center[0]
-            y:  float   = j*windResolution + center[1]
-            wind[i, j] = eval_wind(x, y)
-            start = np.array([x - size[0]/2, y - size[1]/2])
-            stop = start + wind[i, j] * intensityToViz
-            enc.display.draw_arrow(start=(start[0], start[1]), end=(stop[0], stop[1]), color="orange")
+    # wind:           np.ndarray          = np.zeros(shape=(windArraySize[0], windArraySize[1], 2), dtype=np.float32)
+    intensityToViz: float               = 10
+    fakeWindFunction: WindFunction      = WindFunction(lambda x, y: - 8. * np.array([((y-center[1]-size[1])/size[1])**2, (-(x-center[0]-size[0])/size[0])**4]))
+    wind = WindArray(fakeWindFunction, resolution=(10, 10), start=left_down_corner, stop=right_up_corner)
+
+    for i in range(wind.shape[0]):
+        enc.display.draw_arrow(start=wind[i].start, end=wind[i].start + (wind[i].end - wind[i].start) * intensityToViz, color="orange")
 
     # TODO: Add route to ENC
     enc.display.draw_line(waypoints, 'red', edge_style='--', width=.1)
@@ -199,14 +195,19 @@ def main():
     while shipModel.int.time < shipModel.int.sim_time and shipModel:
         start = time.time()
         # Measure position and speed
-        north_position: float   = shipModel.north
-        east_position:  float   = shipModel.east
-        heading:        float   = shipModel.yaw_angle
-        speed:          float   = shipModel.forward_speed
+        north_position: float       = shipModel.north
+        east_position:  float       = shipModel.east
+        heading:        float       = shipModel.yaw_angle
+        speed:          float       = shipModel.forward_speed
+        wind:           WindVector  = fakeWindFunction(north_position, east_position)
+        
+        # Update wind
+        shipModel.wind_dir = 180 * wind.angle / np.pi
+        shipModel.wind_speed = wind.norm
 
         # Print out simulation data
         if (shipModel.int.time / timeSpeedFactor) % updateLogRate == 0:
-            print(f"WP{currentWaypointIndex}, Time: {shipModel.int.time:.1f}, North: {north_position:.1f}, East: {east_position:.1f}, Heading: {heading:.2f}, Speed: {speed:.1f}")
+            print(f"WP{currentWaypointIndex}, Time: {shipModel.int.time:.1f}, North: {north_position:.1f}, East: {east_position:.1f}, Heading: {heading:.2f}, Speed: {speed:.1f}, Wind: {wind.norm:.1f} m/s, {shipModel.wind_dir:.1f} deg")
 
         # Update ENC every second in real time
         if (shipModel.int.time / timeSpeedFactor) % updateVizRate == 0:
